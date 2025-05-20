@@ -1,8 +1,9 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button"; // Example for later form
-import { Input } from "@/components/ui/input"; // Example for later form
-import { Label } from "@/components/ui/label"; // Example for later form
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ShieldCheck } from "lucide-react";
 
 const ApplicationPage = () => {
   return (

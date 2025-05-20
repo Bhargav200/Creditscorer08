@@ -2,30 +2,27 @@
 import { Link, NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, CreditCard } from "lucide-react"; // Added CreditCard for logo
 
 const navItems = [
   { label: "Home", href: "/" },
   { label: "Apply", href: "/apply" },
   { label: "About", href: "/about" },
+  // { label: "Results", href: "/results" }, // Maybe results is not a direct nav item
 ];
 
 const Navbar = () => {
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `text-sm font-medium transition-colors hover:text-primary ${
-      isActive ? "text-primary" : "text-muted-foreground"
+      isActive ? "text-primary text-glow" : "text-muted-foreground hover:text-foreground"
     }`;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center"> {/* Increased height slightly */}
         <Link to="/" className="mr-6 flex items-center space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-            <path d="M2 17l10 5 10-5"></path>
-            <path d="M2 12l10 5 10-5"></path>
-          </svg>
-          <span className="font-bold sm:inline-block">CreditScorer</span>
+          <CreditCard className="h-7 w-7 text-primary" /> {/* Updated Icon */}
+          <span className="font-bold text-xl sm:inline-block text-foreground">CreditScorer</span>
         </Link>
         <nav className="hidden gap-6 md:flex">
           {navItems.map((item) => (
@@ -35,28 +32,41 @@ const Navbar = () => {
           ))}
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          {/* Future auth button can go here */}
+          <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10">
+            Log In
+          </Button>
+          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 drop-shadow-primary">
+            Sign Up
+          </Button>
         </div>
-        <div className="md:hidden">
+        <div className="md:hidden ml-2">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
+                <Menu className="h-6 w-6" />
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <nav className="flex flex-col space-y-4 mt-6">
+            <SheetContent side="right" className="w-[300px] border-l border-border/60 bg-background/95 backdrop-blur-lg sm:w-[400px]">
+              <nav className="flex flex-col space-y-6 mt-8"> {/* Increased spacing and margin */}
                 {navItems.map((item) => (
                   <NavLink
                     key={item.href}
                     to={item.href}
-                    className={({isActive}) => `text-lg font-medium ${isActive ? "text-primary" : "text-muted-foreground"} hover:text-primary`}
+                    className={({isActive}) => `text-lg font-medium transition-colors ${isActive ? "text-primary text-glow" : "text-muted-foreground hover:text-foreground"} hover:text-primary`}
                     end
                   >
                     {item.label}
                   </NavLink>
                 ))}
+                <div className="border-t border-border/40 pt-6 space-y-4">
+                   <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10">
+                    Log In
+                  </Button>
+                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 drop-shadow-primary">
+                    Sign Up
+                  </Button>
+                </div>
               </nav>
             </SheetContent>
           </Sheet>

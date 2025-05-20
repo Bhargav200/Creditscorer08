@@ -10,16 +10,12 @@ import {
   ShieldCheck, 
   Zap, 
   TrendingUp, 
-  MessageSquare,
-  ArrowDown 
+  MessageSquare
 } from "lucide-react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+
+// Import our new component sections
+import HeroSection from "@/components/sections/HeroSection";
+import TestimonialsSection from "@/components/sections/TestimonialsSection";
 
 const HomePage = () => {
   const features = [
@@ -42,27 +38,6 @@ const HomePage = () => {
       icon: <TrendingUp className="h-12 w-12 text-primary mb-4" />,
       title: "Improve Your Score",
       description: "Actionable advice to help you improve your financial standing over time.",
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Homeowner",
-      image: "https://i.pravatar.cc/150?img=32",
-      quote: "CreditScorer helped me understand my finances better and I was able to secure a loan for my new home with favorable rates."
-    },
-    {
-      name: "Michael Chen",
-      role: "Small Business Owner",
-      image: "https://i.pravatar.cc/150?img=11",
-      quote: "The detailed reports gave me insights I needed to improve my business credit profile and expand my operations."
-    },
-    {
-      name: "Jessica Williams",
-      role: "First-time Homebuyer",
-      image: "https://i.pravatar.cc/150?img=5",
-      quote: "As someone new to credit management, the personalized recommendations were invaluable for building my financial future."
     }
   ];
 
@@ -94,45 +69,8 @@ const HomePage = () => {
 
   return (
     <div className="flex flex-col items-center bg-background text-foreground">
-      {/* Hero Section with Enhanced Background */}
-      <section className="w-full min-h-[90vh] py-20 md:py-32 lg:py-40 flex items-center justify-center relative overflow-hidden">
-        {/* Circular glowing effects in the background */}
-        <div className="absolute w-[80vw] h-[80vw] rounded-full bg-primary/5 animate-pulse-slow top-[-30%] left-[10%]"></div>
-        <div className="absolute w-[60vw] h-[60vw] rounded-full bg-primary/10 animate-pulse-slower top-[-10%] right-[-20%]"></div>
-        <div className="absolute w-[40vw] h-[40vw] rounded-full bg-accent/5 animate-pulse-slow bottom-[-10%] left-[-10%]"></div>
-        
-        {/* Main gradient background */}
-        <div className="absolute inset-0 bg-gradient-hero opacity-40"></div>
-        <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-background to-transparent"></div>
-        
-        <div className="container mx-auto px-4 flex flex-col items-center relative z-10">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight mb-6 text-center max-w-5xl">
-            Transform Your <span className="text-primary text-glow animate-glow">Financial Future</span>
-          </h1>
-          <p className="max-w-2xl mt-4 text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed text-center">
-            Advanced credit scoring powered by AI. Get accurate insights to achieve your financial goals with personalized recommendations.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 mt-8">
-            <Link to="/apply">
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-10 py-7 rounded-full drop-shadow-primary-lg transition-transform hover:scale-105">
-                Get Your Free Credit Score
-              </Button>
-            </Link>
-            <Link to="#features">
-              <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary/10 text-lg px-10 py-7 rounded-full transition-all">
-                Explore Features
-              </Button>
-            </Link>
-          </div>
-          <p className="mt-4 text-sm text-muted-foreground">No impact on your credit score. Ever.</p>
-        </div>
-        
-        <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 flex justify-center w-full">
-          <a href="#features" className="animate-bounce p-2 bg-primary/10 rounded-full">
-            <ArrowDown className="h-6 w-6 text-primary" />
-          </a>
-        </div>
-      </section>
+      {/* Use our new Hero Section component */}
+      <HeroSection />
 
       {/* Stats Section */}
       <section className="w-full py-16 bg-secondary/20">
@@ -246,49 +184,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section with Carousel */}
-      <section className="w-full py-20 md:py-28 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-hero opacity-20"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">What Our Users Say</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of satisfied users who have improved their credit score with our platform.
-            </p>
-          </div>
-
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="max-w-4xl mx-auto"
-          >
-            <CarouselContent>
-              {testimonials.map((testimonial, index) => (
-                <CarouselItem key={index} className="md:basis-full pl-4">
-                  <div className="p-6 bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl h-full">
-                    <div className="flex items-center mb-4">
-                      <div className="mr-4 h-12 w-12 rounded-full overflow-hidden border border-primary/30">
-                        <img src={testimonial.image} alt={testimonial.name} className="h-full w-full object-cover" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">{testimonial.name}</h4>
-                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                      </div>
-                    </div>
-                    <p className="text-muted-foreground italic">"{testimonial.quote}"</p>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <div className="flex justify-center mt-8 gap-2">
-              <CarouselPrevious className="relative inset-0 translate-y-0 mx-2" />
-              <CarouselNext className="relative inset-0 translate-y-0 mx-2" />
-            </div>
-          </Carousel>
-        </div>
-      </section>
+      {/* Use our new Testimonials Section component */}
+      <TestimonialsSection />
 
       {/* FAQ Section */}
       <section className="w-full py-20 md:py-28 bg-secondary/20">

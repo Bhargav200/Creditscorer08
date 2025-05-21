@@ -1,12 +1,12 @@
 
-import React from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
+import useEmblaCarousel from 'embla-carousel-react';
+import Autoplay from 'embla-carousel-autoplay';
 
 // Define testimonial type for better type safety
 interface Testimonial {
@@ -17,6 +17,26 @@ interface Testimonial {
 }
 
 const TestimonialsSection = () => {
+  // Autoplay plugin with configuration
+  const autoplayPlugin = useRef(
+    Autoplay({
+      delay: 4000,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+    })
+  );
+
+  // Use embla carousel with custom plugins and options
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+      align: "start",
+      skipSnaps: false,
+      dragFree: true,
+    },
+    [autoplayPlugin.current]
+  );
+
   // Testimonial data
   const testimonials: Testimonial[] = [
     {
@@ -36,6 +56,18 @@ const TestimonialsSection = () => {
       role: "First-time Homebuyer",
       image: "https://i.pravatar.cc/150?img=5",
       quote: "As someone new to credit management, the personalized recommendations were invaluable for building my financial future."
+    },
+    {
+      name: "David Rodriguez",
+      role: "Entrepreneur",
+      image: "https://i.pravatar.cc/150?img=8",
+      quote: "Thanks to CreditScorer, I was able to identify areas to improve my credit score before applying for business financing."
+    },
+    {
+      name: "Emma Thompson",
+      role: "Graduate Student",
+      image: "https://i.pravatar.cc/150?img=23",
+      quote: "The platform made it easy to understand my credit situation as I prepare for life after graduation."
     }
   ];
 
@@ -50,16 +82,13 @@ const TestimonialsSection = () => {
           </p>
         </div>
 
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          className="max-w-4xl mx-auto"
-        >
-          <CarouselContent>
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex">
             {testimonials.map((testimonial, index) => (
-              <CarouselItem key={index} className="md:basis-full pl-4 transition-opacity duration-300">
+              <div 
+                key={index} 
+                className="flex-[0_0_100%] md:flex-[0_0_33.333%] min-w-0 pl-4 pr-4"
+              >
                 <div className="p-6 bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl h-full glass-effect transform transition-all duration-500 hover:scale-[1.02]">
                   <div className="flex items-center mb-4">
                     <div className="mr-4 h-12 w-12 rounded-full overflow-hidden border border-primary/30">
@@ -72,14 +101,10 @@ const TestimonialsSection = () => {
                   </div>
                   <p className="text-muted-foreground italic">"{testimonial.quote}"</p>
                 </div>
-              </CarouselItem>
+              </div>
             ))}
-          </CarouselContent>
-          <div className="flex justify-center mt-8 gap-2">
-            <CarouselPrevious className="relative inset-0 translate-y-0 mx-2" />
-            <CarouselNext className="relative inset-0 translate-y-0 mx-2" />
           </div>
-        </Carousel>
+        </div>
       </div>
     </section>
   );

@@ -1,7 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldCheck } from "lucide-react";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase-client";
+import { calculateCreditScore } from "@/services/creditScoring";
+import { toast } from "@/hooks/use-toast";
 
 import FormProgress from "@/components/application-form/FormProgress";
 import PersonalInfoStep from "@/components/application-form/PersonalInfoStep";
@@ -13,6 +17,24 @@ const steps = ["Personal Info", "Financial Profile", "Loan Information", "Review
 
 const ApplicationPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const navigate = useNavigate();
+  
+  // Check authentication status on component mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (isSupabaseConfigured()) {
+        const { data } = await supabase.auth.getSession();
+        if (data?.session?.user) {
+          setUserId(data.session.user.id);
+        }
+      }
+    };
+    
+    checkAuth();
+  }, []);
+  
   const [formData, setFormData] = useState({
     // Personal Info
     fullName: "",
@@ -64,9 +86,86 @@ const ApplicationPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleSubmit = () => {
-    console.log("Form submitted with data:", formData);
-    // In a real app, we would send this data to the backend
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Store application in database if authenticated
+      let applicationId = null;
+      
+      if (isSupabaseConfigured() && userId) {
+        // Save application to database
+        const { data, error } = await supabase
+          .from('credit_applications')
+          .insert({
+            user_id: userId,
+            personal_info: {
+              fullName: formData.fullName,
+              email: formData.email,
+              phone: formData.phone,
+              age: formData.age,
+              address: formData.address,
+              city: formData.city,
+              state: formData.state,
+              zipCode: formData.zipCode,
+            },
+            financial_details: {
+              employmentStatus: formData.employmentStatus,
+              annualIncome: formData.annualIncome,
+              creditAccounts: formData.creditAccounts,
+              creditUtilization: formData.creditUtilization,
+              monthlyDebt: formData.monthlyDebt,
+              monthlyExpenses: formData.monthlyExpenses,
+              creditHistory: formData.creditHistory,
+              paymentHistory: formData.paymentHistory,
+              recentInquiries: formData.recentInquiries,
+            },
+            loan_info: {
+              loanAmount: formData.loanAmount,
+              loanPurpose: formData.loanPurpose,
+              loanTerm: formData.loanTerm,
+              hasCollateral: formData.hasCollateral,
+              collateralDescription: formData.collateralDescription,
+              additionalInformation: formData.additionalInformation,
+            },
+            status: 'submitted',
+          })
+          .select('id')
+          .single();
+          
+        if (error) throw error;
+        applicationId = data?.id;
+      }
+      
+      // Calculate credit score using our enterprise-level service
+      // Even for non-authenticated users, we provide a score estimate
+      const effectiveUserId = userId || 'guest-user';
+      const creditResult = await calculateCreditScore(formData, effectiveUserId);
+      
+      // Store the credit score in localStorage for retrieval on results page
+      localStorage.setItem('creditScoreResult', JSON.stringify({
+        score: creditResult.score,
+        factors: creditResult.factors,
+        applicationId
+      }));
+      
+      toast({
+        title: "Application Submitted",
+        description: "Your credit score has been calculated successfully.",
+      });
+      
+      // Navigate to results page
+      navigate('/results');
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      toast({
+        variant: "destructive",
+        title: "Submission Failed",
+        description: "We encountered an error processing your application. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -136,6 +235,7 @@ const ApplicationPage = () => {
                 onBack={handleBack}
                 onSubmit={handleSubmit}
                 formData={formData}
+                isLoading={isLoading}
                 defaultValues={{
                   termsAccepted: formData.termsAccepted,
                   dataProcessingConsent: formData.dataProcessingConsent,

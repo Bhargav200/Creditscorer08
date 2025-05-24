@@ -8,6 +8,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { submitApplication } from "@/services/applicationService";
 
 const submissionSchema = z.object({
   termsAccepted: z.boolean().refine((val) => val === true, {
@@ -32,6 +34,7 @@ type SubmissionStepProps = {
 const SubmissionStep = ({ onBack, onSubmit, formData, defaultValues, disabled = false }: SubmissionStepProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const form = useForm<z.infer<typeof submissionSchema>>({
     resolver: zodResolver(submissionSchema),
@@ -42,21 +45,33 @@ const SubmissionStep = ({ onBack, onSubmit, formData, defaultValues, disabled = 
     },
   });
 
-  const handleSubmit = (data: z.infer<typeof submissionSchema>) => {
-    // In a real app, we would submit the entire form data to the backend here
-    console.log("Final form data:", { ...formData, ...data });
-    
-    toast({
-      title: "Application Submitted",
-      description: "Your credit score application has been submitted successfully!",
-      duration: 5000,
-    });
-    
-    // Navigate to results page
-    setTimeout(() => {
-      onSubmit();
-      navigate("/results");
-    }, 1000);
+  const handleSubmit = async (data: z.infer<typeof submissionSchema>) => {
+    try {
+      const result = await submitApplication(formData, user?.id);
+      
+      if (result.success) {
+        toast({
+          title: "Application Submitted",
+          description: "Your credit score application has been submitted successfully!",
+          duration: 5000,
+        });
+        
+        // Navigate to results page
+        setTimeout(() => {
+          onSubmit();
+          navigate("/results");
+        }, 1000);
+      } else {
+        throw new Error("Failed to submit application");
+      }
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      toast({
+        variant: "destructive",
+        title: "Submission Error",
+        description: "There was an error submitting your application. Please try again.",
+      });
+    }
   };
 
   return (

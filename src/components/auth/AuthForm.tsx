@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { supabase } from '@/lib/supabase-client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { useToast } from '@/hooks/use-toast'
+import { useAuth } from '@/contexts/AuthContext'
+import { isSupabaseConfigured } from '@/lib/supabase-client'
 
 // Define form schemas
 const loginSchema = z.object({
@@ -32,6 +32,10 @@ const AuthForm = () => {
   const [formType, setFormType] = useState<'login' | 'register'>('login')
   const { toast } = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
+  const { signIn, signUp } = useAuth()
+
+  const from = location.state?.from?.pathname || '/dashboard'
 
   // Login form
   const loginForm = useForm<LoginFormValues>({
@@ -54,32 +58,24 @@ const AuthForm = () => {
 
   // Handle login submission
   const onLoginSubmit = async (data: LoginFormValues) => {
-    setIsLoading(true)
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      })
-
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error signing in",
-          description: error.message,
-        })
-        return
-      }
-
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in.",
-      })
-      navigate('/dashboard')
-    } catch (error) {
+    if (!isSupabaseConfigured()) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: "Configuration Error",
+        description: "Please connect your project to Supabase to use authentication.",
+      })
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      await signIn(data.email, data.password)
+      navigate(from, { replace: true })
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error signing in",
+        description: error.message,
       })
     } finally {
       setIsLoading(false)
@@ -88,57 +84,44 @@ const AuthForm = () => {
 
   // Handle register submission
   const onRegisterSubmit = async (data: RegisterFormValues) => {
-    setIsLoading(true)
-    try {
-      // Register the user
-      const { error: signUpError, data: signUpData } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            full_name: data.fullName,
-          },
-        },
-      })
-
-      if (signUpError) {
-        toast({
-          variant: "destructive",
-          title: "Error creating account",
-          description: signUpError.message,
-        })
-        return
-      }
-
-      // Create profile record
-      if (signUpData.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: signUpData.user.id,
-            email: data.email,
-            full_name: data.fullName,
-          })
-
-        if (profileError) {
-          console.error("Error creating profile:", profileError)
-        }
-      }
-
-      toast({
-        title: "Account created",
-        description: "Please check your email to confirm your account.",
-      })
-      setFormType('login')
-    } catch (error) {
+    if (!isSupabaseConfigured()) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: "Configuration Error",
+        description: "Please connect your project to Supabase to use authentication.",
+      })
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      await signUp(data.email, data.password, data.fullName)
+      setFormType('login')
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error creating account",
+        description: error.message,
       })
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (!isSupabaseConfigured()) {
+    return (
+      <div className="w-full max-w-md mx-auto bg-card/50 backdrop-blur-sm p-6 rounded-xl border border-border/30">
+        <div className="text-center space-y-4">
+          <h3 className="text-lg font-semibold">Supabase Configuration Required</h3>
+          <p className="text-sm text-muted-foreground">
+            To use authentication features, please connect your project to Supabase using the green button in the top right corner.
+          </p>
+          <Button onClick={() => navigate('/')} variant="outline">
+            Return to Home
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '@/lib/supabase-client'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase-client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -24,6 +23,11 @@ const DashboardPage = () => {
 
   useEffect(() => {
     const checkUser = async () => {
+      if (!isSupabaseConfigured() || !supabase) {
+        navigate('/login')
+        return
+      }
+
       const { data, error } = await supabase.auth.getUser()
       
       if (error || !data?.user) {
@@ -41,6 +45,8 @@ const DashboardPage = () => {
   const fetchUserData = async (userId: string) => {
     try {
       setLoading(true)
+      
+      if (!supabase) return
       
       // Fetch credit scores
       const { data: scoreData, error: scoreError } = await supabase

@@ -37,7 +37,7 @@ const ResultsPage = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       // Check if user is authenticated
-      if (isSupabaseConfigured()) {
+      if (isSupabaseConfigured() && supabase) {
         const { data } = await supabase.auth.getSession();
         if (data?.session?.user) {
           setUserId(data.session.user.id);
@@ -104,7 +104,7 @@ const ResultsPage = () => {
     
     // Fetch historical score data for authenticated users
     const fetchUserScoreHistory = async () => {
-      if (!isSupabaseConfigured() || !userId) {
+      if (!isSupabaseConfigured() || !userId || !supabase) {
         setIsLoading(false);
         return;
       }
@@ -141,7 +141,7 @@ const ResultsPage = () => {
         } else {
           // No historical data found, redirect to application
           toast({
-            variant: "warning",
+            variant: "destructive",
             title: "No score data found",
             description: "Please complete an application first to view your results.",
           });

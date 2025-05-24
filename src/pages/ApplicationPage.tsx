@@ -93,7 +93,7 @@ const ApplicationPage = () => {
       // Store application in database if authenticated
       let applicationId = null;
       
-      if (isSupabaseConfigured() && userId) {
+      if (isSupabaseConfigured() && userId && supabase) {
         // Save application to database
         const { data, error } = await supabase
           .from('credit_applications')
@@ -235,12 +235,12 @@ const ApplicationPage = () => {
                 onBack={handleBack}
                 onSubmit={handleSubmit}
                 formData={formData}
-                isLoading={isLoading}
                 defaultValues={{
                   termsAccepted: formData.termsAccepted,
                   dataProcessingConsent: formData.dataProcessingConsent,
                   privacyPolicyAcknowledged: formData.privacyPolicyAcknowledged,
                 }}
+                disabled={isLoading}
               />
             )}
           </div>

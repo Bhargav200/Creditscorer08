@@ -14,23 +14,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
-// Create Supabase client with fallback handling
-export const supabase = createClient<Database>(
-  supabaseUrl,
-  supabaseAnonKey,
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-    },
-    // Add global error handler for API failures
-    global: {
-      fetch: (...args) => fetch(...args),
-    },
-  }
-)
+// Create Supabase client with fallback handling - only create if we have valid config
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient<Database>(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+      },
+    })
+  : null
 
 // Helper function to check if Supabase connection is valid
 export const isSupabaseConfigured = () => {
-  return Boolean(supabaseUrl && supabaseAnonKey)
+  return Boolean(supabase && supabaseUrl && supabaseAnonKey)
 }

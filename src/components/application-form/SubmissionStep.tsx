@@ -1,4 +1,3 @@
-
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,9 +26,10 @@ type SubmissionStepProps = {
   onSubmit: () => void;
   formData: any;
   defaultValues: any;
+  disabled?: boolean;
 };
 
-const SubmissionStep = ({ onBack, onSubmit, formData, defaultValues }: SubmissionStepProps) => {
+const SubmissionStep = ({ onBack, onSubmit, formData, defaultValues, disabled = false }: SubmissionStepProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -106,6 +106,7 @@ const SubmissionStep = ({ onBack, onSubmit, formData, defaultValues }: Submissio
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={disabled}
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
@@ -127,6 +128,7 @@ const SubmissionStep = ({ onBack, onSubmit, formData, defaultValues }: Submissio
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={disabled}
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
@@ -148,6 +150,7 @@ const SubmissionStep = ({ onBack, onSubmit, formData, defaultValues }: Submissio
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={disabled}
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
@@ -172,6 +175,7 @@ const SubmissionStep = ({ onBack, onSubmit, formData, defaultValues }: Submissio
             size="lg" 
             onClick={onBack}
             className="border-primary text-primary hover:bg-primary/10"
+            disabled={disabled}
           >
             Back
           </Button>
@@ -179,8 +183,10 @@ const SubmissionStep = ({ onBack, onSubmit, formData, defaultValues }: Submissio
             type="submit" 
             size="lg" 
             className="bg-primary text-primary-foreground hover:bg-primary/90 drop-shadow-primary flex items-center"
+            disabled={disabled}
           >
-            <CheckCircle className="mr-2 h-4 w-4" /> Submit Application
+            <CheckCircle className="mr-2 h-4 w-4" /> 
+            {disabled ? "Submitting..." : "Submit Application"}
           </Button>
         </div>
       </form>

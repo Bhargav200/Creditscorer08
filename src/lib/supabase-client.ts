@@ -15,7 +15,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Create Supabase client with fallback handling - only create if we have valid config
-export const supabase = supabaseUrl && supabaseAnonKey 
+export const supabase = supabaseUrl && supabaseAnonKey && supabaseUrl !== '' && supabaseAnonKey !== ''
   ? createClient<Database>(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,
@@ -26,5 +26,5 @@ export const supabase = supabaseUrl && supabaseAnonKey
 
 // Helper function to check if Supabase connection is valid
 export const isSupabaseConfigured = () => {
-  return Boolean(supabase && supabaseUrl && supabaseAnonKey)
+  return Boolean(supabase && supabaseUrl && supabaseAnonKey && supabaseUrl !== '' && supabaseAnonKey !== '')
 }

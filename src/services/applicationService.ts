@@ -1,6 +1,6 @@
 
 import { supabase, isSupabaseConfigured } from '@/lib/supabase-client'
-import { calculateCreditScore } from '@/lib/credit-scoring'
+import { calculateCreditScore } from './creditScoring'
 
 interface ApplicationData {
   personal_info: {
@@ -22,8 +22,8 @@ interface ApplicationData {
 }
 
 export const submitApplication = async (formData: any, userId?: string) => {
-  // Calculate credit score using existing service
-  const scoreResult = calculateCreditScore(formData)
+  // Calculate credit score using existing service - await the Promise
+  const scoreResult = await calculateCreditScore(formData, userId || 'guest')
   
   if (!isSupabaseConfigured() || !supabase || !userId) {
     // Store in localStorage for guest users

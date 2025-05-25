@@ -9,10 +9,113 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      credit_applications: {
+        Row: {
+          created_at: string | null
+          financial_details: Json
+          id: string
+          loan_info: Json
+          personal_info: Json
+          recommendations: Json | null
+          score: number | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          financial_details: Json
+          id?: string
+          loan_info: Json
+          personal_info: Json
+          recommendations?: Json | null
+          score?: number | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          financial_details?: Json
+          id?: string
+          loan_info?: Json
+          personal_info?: Json
+          recommendations?: Json | null
+          score?: number | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      credit_scores: {
+        Row: {
+          created_at: string | null
+          factors: Json | null
+          id: string
+          report_date: string | null
+          score: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          factors?: Json | null
+          id?: string
+          report_date?: string | null
+          score: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          factors?: Json | null
+          id?: string
+          report_date?: string | null
+          score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          address: Json | null
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          notification_preferences: Json | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: Json | null
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          notification_preferences?: Json | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: Json | null
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          notification_preferences?: Json | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      user_credit_history: {
+        Row: {
+          application_count: number | null
+          latest_score: number | null
+          score_trend: Json | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
